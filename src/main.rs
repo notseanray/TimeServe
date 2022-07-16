@@ -18,7 +18,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     }
     if !args.contains(&"--serve".to_string()) {
         if !Uid::effective().is_root() {
-            panic!("You must run this executable with root permissions");
+            eprintln!("You must run this executable with root permissions");
+            std::process::exit(1);
         }
         let client: Client = Config::new()
             .set_base_url(
@@ -46,9 +47,17 @@ async fn main() -> Result<(), Box<dyn Error>> {
         Command::new("date").args(["--set", &date_string]).spawn()?;
         std::process::exit(0);
     }
+    if args.len() < 3 {
+        eprintln!("missing port");
+        std::process::exit(1);
+    }
     let mut app = tide::new();
     app.at("/").get(current_time);
-    app.listen("127.0.0.1:3030").await?;
+    app.listen(format!(
+        "0.0.0.0:{}",
+        args[2].parse::<u16>().expect("invalid port")
+    ))
+    .await?;
     Ok(())
 }
 

@@ -8,7 +8,7 @@ Creates an HTTP endpoint to request the UNIX timestamp in ms. You can run the se
 ##### Examples:
 ```
 // server
-$ ./TimeServe --serve
+$ ./TimeServe --serve 54321
 // sync
-# ./TimeServe 192.168.1.0
+# ./TimeServe 192.168.1.0:54321
 ```
