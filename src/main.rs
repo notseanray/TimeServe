@@ -42,7 +42,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             .duration_since(UNIX_EPOCH)
             .expect("clock went backwards")
             .as_millis();
-        let dt = Local.timestamp_millis(result - (next as i64 - now as i64) / 2);
+        let dt = Local.timestamp_millis(result + (next as i64 - now as i64) / 2);
         let date_string = format!(
             "{}-{}-{} {}:{}:{}",
             dt.year(),
