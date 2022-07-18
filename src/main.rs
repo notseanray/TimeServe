@@ -21,20 +21,28 @@ async fn main() -> Result<(), Box<dyn Error>> {
             eprintln!("You must run this executable with root permissions");
             std::process::exit(1);
         }
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("clock went backwards")
+            .as_millis();
         let client: Client = Config::new()
             .set_base_url(
                 Url::parse(format!("http://{}", args[1]).as_str()).expect("invalid server"),
             )
             .set_timeout(Some(Duration::from_secs(5)))
             .try_into()?;
-        let result = match client.get("/").await?.body_string().await?.parse() {
+        let result: i64 = match client.get("/").await?.body_string().await?.parse() {
             Ok(v) => v,
             Err(_) => {
                 eprint!("Invalid response from server");
                 std::process::exit(1);
             }
         };
-        let dt = Local.timestamp_millis(result);
+        let next = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("clock went backwards")
+            .as_millis();
+        let dt = Local.timestamp_millis(result - (next as i64 - now as i64) / 2);
         let date_string = format!(
             "{}-{}-{} {}:{}:{}",
             dt.year(),
